@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Salary Calculator</title>
+	<style>
+		.field{
+			margin-bottom: 10px;
+		}
+		label{
+			display: block;
+		}
+		body{
+			margin-left: 50px
+		}
+		td{
+			padding: 10px;
+		}
+		#tdSalary{
+			font-size: 20pt;
+			color : red;
+		}
+	</style>
+	<script src="jquery-3.3.1.min.js"></script>
+	<script>
+		String.prototype.toInt = function() {
+			return parseInt(this,10);
+		};
+
+		//state & behavior
+		//Model
+		function SalaryCalaculatorModel(){
+			var _data = {
+				basic : 0,
+				hra : 0,
+				da : 0,
+				tax : 0,
+				salary : 0
+			};
+
+			var _changeListeners = {
+				basic : null,
+				hra : null,
+				da : null,
+				tax : null,
+				salary : null
+			};
+
+			this.subscribe = function(attrName, listenerFn){
+				_changeListeners[attrName] = listenerFn;
+			};
+
+			this.get = function(attrName){
+				return _data[attrName];
+			};
+
+			this.set = function(attrName, value){
+				if (_data[attrName] === value) return;
+				_data[attrName] = value;
+				var listenerFn = _changeListeners[attrName];
+				if (typeof listenerFn === 'function')
+					listenerFn.call(this, value);
+			};
+		}
+		SalaryCalaculatorModel.prototype.calculate = function() {
+			var gross = this.get('basic') + this.get('hra') + this.get('da');
+			var net = gross * ((100-this.get('tax'))/100);
+			this.set('salary', net);
+		};
+
+		//View
+		$(function(){
+			window.model = new SalaryCalaculatorModel();
+
+			//Reacting to user actions
+			$('#txtBasic').change(function(){
+				model.set('basic', $('#txtBasic').val().toInt());
+			});
+
+			$('#txtHra').change(function(){
+				model.set('hra', $('#txtHra').val().toInt());
+			});
+
+			$('#txtDa').change(function(){
+				model.set('da', $('#txtDa').val().toInt());
+			});
+
+			$('#rangeTax').change(function(){
+				model.set('tax', $('#rangeTax').val().toInt());
+			});
+
+			$('#btnCalculate').click(function(){
+				model.calculate();
+			});
+
+			//Reacting to model changes
+			model.subscribe('salary', function(value){
+				$('#tdSalary').html(value);
+			});
+
+			model.subscribe('basic', function(value){
+				$('#tdBasic').html(value);
+			})
+
+			model.subscribe('hra', function(value){
+				$('#tdHra').html(value);
+			})
+
+			model.subscribe('da', function(value){
+				$('#tdDa').html(value);
+			})
+
+			model.subscribe('tax', function(value){
+				$('#tdTax').html(value);
+			})
+		});
+	</script>
+</head>
+<body>
+	<h1>Salary Calculator</h1>
+	<hr>
+	<section>
+		<div class="field">
+			<label for="">Basic :</label>
+			<input type="number" id="txtBasic">
+		</div>
+		<div class="field">
+			<label for="">HRA :</label>
+			<input type="number" id="txtHra">
+		</div>
+		<div class="field">
+			<label for="">DA :</label>
+			<input type="number" id="txtDa">
+		</div>
+		<div class="field">
+			<label for="">Tax :</label>
+			<input type="range" id="rangeTax" min="0" max="30" value="0">
+		</div>
+		<div class="field">
+			<input type="button" value="Calculate" id="btnCalculate">
+		</div>
+		<div class="field">
+			<table>
+				<tbody>
+					<tr>
+						<td id="tdBasic">[Basic]</td>
+						<td id="tdHra">[HRA]</td>
+						<td id="tdDa">[Da]</td>
+						<td id="tdTax">[Tax]</tdTax>
+						<td id="tdSalary">[Salary]</tdSalary>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+</body>
+</html>
