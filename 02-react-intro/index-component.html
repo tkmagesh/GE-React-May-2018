@@ -9,14 +9,30 @@
 	<script type="text/babel">
 
 		class MyComponent extends React.Component{
+			state = {
+				currentTime : Date()
+			};
+			userNameRef = React.createRef();
+
+			constructor(){
+				super();
+				this.onBtnRenderClick = this.onBtnRenderClick.bind(this);
+			}
 			onBtnRenderClick(){
-				console.log('render button clicked');
+				let userName = this.userNameRef.current.value;
+				let message = 'Hi ' + userName + ', ' + this.props.msgTemplate;
+				this.setState({ 
+					currentTime : new Date(),
+					msg : message
+				});
 			}
 			render(){
 				var content = (
 					<div>
+						<label> User Name :</label>
+						<input type="text" ref={this.userNameRef}/>
 						<input type="button" value="Render" id="btnRender" onClick={this.onBtnRenderClick} />
-						<h3>Welcome to React.js</h3>
+						<h3>{this.state.msg}</h3>
 						<h4>{Date()}</h4>
 					</div>
 				);
@@ -24,7 +40,8 @@
 			}
 		}
 
-		ReactDOM.render(React.createElement(MyComponent), 
+		let messageTemplate = 'Have a nice weekend!';
+		ReactDOM.render(<MyComponent msgTemplate={messageTemplate}/>, 
 					document.getElementById('root'))
 		
 	</script>
