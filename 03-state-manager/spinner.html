@@ -7,8 +7,54 @@
 	<script src="react-dom.development.js"></script>
 	<script src="babel.min.js"></script>
 	<script src="stateManager.js"></script>
+	<script type="text/babel">
+		function spinnerReducer(currentState = 0, action){
+			if (action.type === 'INCREMENT')
+				return currentState + action.payload;
+			if (action.type === 'DECREMENT')
+				return currentState - action.payload;
+			return currentState;
+		}
+		let store = SM.createStore(spinnerReducer);
+
+		class Spinner extends React.Component{
+			txtDeltaRef = React.createRef();
+
+			constructor(props){
+				super(props);
+				this.btnDecrementClick = this.btnDecrementClick.bind(this);
+				this.btnIncrementClick = this.btnIncrementClick.bind(this);
+			}
+			btnDecrementClick(){
+				let decrementAction = { type : 'DECREMENT', payload : this.txtDeltaRef.current.valueAsNumber };
+				this.props.store.dispatch(decrementAction);
+			}
+			btnIncrementClick(){
+				let incrementAction = { type : 'INCREMENT', payload : this.txtDeltaRef.current.valueAsNumber };
+				this.props.store.dispatch(incrementAction);
+			}
+			render(){
+				let value = this.props.store.getState();
+				return(
+					<div>
+						<input type="number" ref={this.txtDeltaRef} />
+						<br />
+						<input type="button" value="DECREMENT" onClick={this.btnDecrementClick} />
+						<span>[ {value} ]</span>
+						<input type="button" value="INCREMENT" onClick={this.btnIncrementClick} />
+					</div>
+				)
+			}
+		}
+		function renderApp(){
+			ReactDOM.render(<Spinner store={store} />,
+				document.getElementById('root'));
+		}
+		renderApp();
+		store.subscribe(renderApp);
+	</script>
 </head>
 <body>
-	
+	<div id="root" />
 </body>
 </html>
