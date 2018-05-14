@@ -88,14 +88,14 @@
 				this.onBtnCalculateClick = this.onBtnCalculateClick.bind(this);
 			}
 
-			onBasicChange(evt){
-				this.props.model.set('basic', evt.target.valueAsNumber);
+			onBasicChange(value){
+				this.props.model.set('basic', value);
 			}
-			onHraChange(evt){
-				this.props.model.set('hra', evt.target.valueAsNumber);
+			onHraChange(value){
+				this.props.model.set('hra', value);
 			}
-			onDaChange(evt){
-				this.props.model.set('da', evt.target.valueAsNumber);
+			onDaChange(value){
+				this.props.model.set('da', value);
 			}
 			onTaxChange(evt){
 				this.props.model.set('tax', evt.target.valueAsNumber);
@@ -109,18 +109,9 @@
 					data = model.toJSON();
 				return(
 					<section>
-						<div className="field">
-							<label htmlFor="">Basic :</label>
-							<input type="number" onChange={this.onBasicChange} />
-						</div>
-						<div className="field">
-							<label htmlFor="">HRA :</label>
-							<input type="number" onChange={this.onHraChange}/>
-						</div>
-						<div className="field">
-							<label htmlFor="">DA :</label>
-							<input type="number" onChange={this.onDaChange} />
-						</div>
+						<SalaryCalculatorInput displayName="Basic :" valueChange={this.onBasicChange} />
+						<SalaryCalculatorInput displayName="HRA :" valueChange={this.onHraChange} />
+						<SalaryCalculatorInput displayName="DA :" valueChange={this.onDaChange} />
 						<div className="field">
 							<label htmlFor="">Tax :</label>
 							<input type="range" min="0" max="30" onChange={this.onTaxChange} />
@@ -130,6 +121,26 @@
 						</div>
 						<SalaryCalculatorResult data={data}/>
 					</section>
+				)
+			}
+		}
+
+		class SalaryCalculatorInput extends React.Component{
+			constructor(props){
+				super(props);
+				this.onInputChange = this.onInputChange.bind(this);
+			}
+			onInputChange(evt){
+				let value = evt.target.valueAsNumber;
+				this.props.valueChange(value);
+			}
+			render(){
+				let { displayName } = this.props; 
+				return(
+					<div className="field">
+						<label htmlFor="">{displayName}</label>
+						<input type="number" onChange={this.onInputChange} />
+					</div>
 				)
 			}
 		}
