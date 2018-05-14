@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Bug Tracker</title>
+	<style>
+		body{
+			margin-left: 50px;
+		}
+		section{
+			margin-bottom: 10px;
+		}
+		.closed{
+			color : red;
+			text-decoration: line-through;
+			font-style: italic;
+			font-weight: bold;
+		}
+		.bugname, .stats{
+			font-size: 18pt;
+		}
+		.bugname{
+			cursor : pointer;
+		}
+		ol{
+			list-style: none;
+			width: 500px;
+			-webkit-padding-start : 0px;
+		}
+		li{
+			margin-bottom: 10px;
+			padding: 5px;
+			border-radius: 5px;
+			background-color: #e7e7e7;
+			border : 1px solid gray;
+		}
+		.datetime{
+			font-style: italic;
+		}
+	</style>
+	<script src="react.development.js"></script>
+	<script src="react-dom.development.js"></script>
+	<script src="babel.min.js"></script>
+	<script src="redux.js"></script>
+	<script type="text/babel">
+		
+
+		let bugActionCreators = {
+			addNew(bugName){
+				let newBug = { name : bugName, isClosed : false, createdAt : new Date()};
+				return { type : 'ADD_NEW', payload : newBug };
+			},
+			toggle(bugToToggle){
+				let toggledBug = { ...bugToToggle, isClosed : !bugToToggle.isClosed};
+				return { type : 'UPDATE', payload : { oldBug : bugToToggle, newBug : toggledBug}};
+			},
+			removeClosed(bugs){
+				let closedBugs = bugs.filter(bug => bug.isClosed);
+				return { type : 'REMOVE', payload : closedBugs};
+			}
+		}
+		function bugsReducer(currentState = [], action){
+			if (action.type === 'ADD_NEW'){
+				return [...currentState, action.payload];
+			}
+			if (action.type === 'UPDATE'){
+				let { oldBug, newBug } = action.payload;
+				return currentState.map(bug => bug === oldBug ? newBug : bug);
+			}
+			if (action.type === 'REMOVE'){
+				let closedBugs = action.payload;
+				return currentState.filter(bug => closedBugs.indexOf(bug) < 0);
+			}
+			return currentState;
+		}
+
+		class BugTracker extends React.Component{
+			txtBugNameRef = React.createRef();
+
+			constructor(props){
+				super(props);
+				console.log(props);
+				this.onCreateNewClick = this.onCreateNewClick.bind(this);
+			}
+			onCreateNewClick(){
+				let newBugName = this.txtBugNameRef.current.value;
+				this.props.addNew(newBugName);
+			}
+			render(){
+				let { bugs, actions } = this.props;
+				let bugItems = bugs.map((bug, index) => (
+					<li key={index}>
+						<span className="bugname">{bug.name}</span>
+						<div className="datetime">{bug.createdAt.toString()}</div>
+					</li>
+				))
+				return(
+					<div>
+						<section className="stats">
+							<span className="closed">1</span>
+							<span> / </span>
+							<span>{bugs.length}</span>
+						</section>
+						<section className="edit">
+							<label htmlFor="">Bug Name :</label>
+							<input type="text" ref={this.txtBugNameRef} />
+							<input type="button" value="Create New" onClick={this.onCreateNewClick} />
+						</section>
+						<section className="list">
+							<ol>
+								{bugItems}
+							</ol>
+							<input type="button" value="Remove Closed" />
+						</section>
+					</div>
+				)
+			}
+		}
+
+		let store = Redux.createStore(bugsReducer);
+		let bugActions = Redux.bindActionCreators(bugActionCreators, store.dispatch);
+
+		function renderApp(){
+			let bugs = store.getState();
+			ReactDOM.render(<BugTracker bugs={bugs} {...bugActions} />, 
+				document.getElementById('root'));
+		}
+		renderApp();
+		store.subscribe(renderApp);
+	</script>
+
+</head>
+<body>
+	<h1>Bug Tracker</h1>
+	<hr>
+	<div id="root">
+		
+	</div>
+</body>
+</html>
