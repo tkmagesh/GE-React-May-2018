@@ -18,6 +18,11 @@
 		}
 		#tdSalary{
 			font-size: 20pt;
+		}
+		.goodSalary{
+			color : green;
+		}
+		.poorSalary{
 			color : red;
 		}
 	</style>
@@ -70,6 +75,8 @@
 			var net = gross * ((100-this.get('tax'))/100);
 			this.set('salary', net);
 		};
+
+
 		class SalaryCalculator extends React.Component{
 
 			constructor(props){
@@ -99,7 +106,7 @@
 			}
 			render(){
 				let {model} = this.props,
-					{basic, hra, da, tax, salary } = model.toJSON();
+					data = model.toJSON();
 				return(
 					<section>
 						<div className="field">
@@ -121,20 +128,36 @@
 						<div className="field">
 							<input type="button" value="Calculate" onClick={this.onBtnCalculateClick} />
 						</div>
-						<div className="field">
-							<table>
-								<tbody>
-									<tr>
-										<td id="tdBasic">{basic}</td>
-										<td id="tdHra">{hra}</td>
-										<td id="tdDa">{da}</td>
-										<td id="tdTax">{tax}</td>
-										<td id="tdSalary">{salary}</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
+						<SalaryCalculatorResult data={data}/>
 					</section>
+				)
+			}
+		}
+
+		class SalaryCalculatorResult extends React.Component{
+			render(){
+				let {basic, hra, da, tax, salary} = this.props.data;
+				/*let salaryEle = salary > 10000 ? 
+					(<td id="tdSalary" className="goodSalary">{salary}</td>)
+					:
+					(<td id="tdSalary" className="poorSalary">{salary}</td>);
+				*/
+				let salClass = salary > 10000 ? 'goodSalary' : 'poorSalary';
+				return(
+					<div className="field">
+						<table>
+							<tbody>
+								<tr>
+									<td id="tdBasic">{basic}</td>
+									<td id="tdHra">{hra}</td>
+									<td id="tdDa">{da}</td>
+									<td id="tdTax">{tax}</td>
+									{/*{salaryEle}*/}
+									<td id="tdSalary" className={salClass}>{salary}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 				)
 			}
 		}
