@@ -24,21 +24,10 @@
 			decrement(value){
 				return { type : 'DECREMENT', payload : value }	
 			},
-			
+
 		}
 
-		function bindActionCreators(spinnerActionCreators, dispatch){
-			return {
-				increment(value){
-					let action = spinnerActionCreators.increment(value);
-					dispatch(action);
-				},
-				decrement(value){
-					let action = spinnerActionCreators.decrement(value);
-					dispatch(action);
-				}
-			};
-		}
+
 
 		class Spinner extends React.Component{
 			txtDeltaRef = React.createRef();
@@ -68,7 +57,7 @@
 			}
 		}
 
-		let spinnerActions = bindActionCreators(spinnerActionCreators, store.dispatch);
+		let spinnerActions = SM.bindActionCreators(spinnerActionCreators, store.dispatch);
 		function renderApp(){
 			let value = store.getState();
 			ReactDOM.render(<Spinner value={value} actions={spinnerActions} />,
